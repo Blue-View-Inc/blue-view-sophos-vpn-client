@@ -32,3 +32,5 @@ This free-to-use community application is not affiliated with, endorsed by, spon
 Copyright 2026 The Blue View Group Corporation. Source available under the [PolyForm Noncommercial License 1.0.0](LICENSE); see [NOTICE](NOTICE). This is a noncommercial license, not an OSI-approved open-source license.
 
 Sophos and the Sophos logo are trademarks of Sophos and are not licensed under the project license. Blue View branding is a trademark of The Blue View Group Corporation.
+
+The Lexend Exa typeface is distributed under the [SIL Open Font License 1.1](src/LexendExa-OFL.txt).

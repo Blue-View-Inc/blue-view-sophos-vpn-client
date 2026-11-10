@@ -18,6 +18,7 @@ ApplicationWindow {
   font.family: "Inter"
   Material.theme: darkTheme ? Material.Dark : Material.Light
   Material.accent: darkTheme ? "#9fc57e" : "#356b19"
+  FontLoader { id: sophosHeadingFont; source: "qrc:/LexendExa.ttf" }
   property bool connected: false
   property string details: ""
   property string selectedPath: ""
@@ -81,10 +82,17 @@ ApplicationWindow {
         RowLayout {
           Layout.fillWidth: true; spacing: 11
           Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 46; Layout.preferredHeight: 46; fillMode: Image.PreserveAspectFit }
-          Label { text: qsTr("SOPHOS VPN"); font.pixelSize: 20; font.bold: true; font.letterSpacing: 1; color: window.ink; Layout.fillWidth: true }
+          Label { text: qsTr("SOPHOS VPN"); font.family: sophosHeadingFont.name; font.pixelSize: 19; font.bold: true; font.letterSpacing: -0.5; color: window.ink; Layout.fillWidth: true }
           ToolButton {
-            text: window.darkTheme ? qsTr("Light") : qsTr("Dark")
+            id: themeButton
             Accessible.name: window.darkTheme ? qsTr("Switch to light theme") : qsTr("Switch to dark theme")
+            ToolTip.visible: hovered
+            ToolTip.text: Accessible.name
+            contentItem: Text {
+              text: window.darkTheme ? "☀" : "☾"
+              color: window.ink; font.pixelSize: 24
+              horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+            }
             onClicked: preferences.darkTheme = !preferences.darkTheme
           }
         }

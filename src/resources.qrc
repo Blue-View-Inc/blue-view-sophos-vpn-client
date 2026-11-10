@@ -1,1 +1,1 @@
-<RCC><qresource prefix="/"><file alias="Main.qml">Main.qml</file><file alias="sophos.svg">sophos.svg</file><file alias="blueview-oval.svg">blueview-oval.svg</file><file alias="blueview-oval-light.svg">blueview-oval-light.svg</file></qresource></RCC>
+<RCC><qresource prefix="/"><file alias="Main.qml">Main.qml</file><file alias="sophos.svg">sophos.svg</file><file alias="blueview-oval.svg">blueview-oval.svg</file><file alias="blueview-oval-light.svg">blueview-oval-light.svg</file><file alias="LexendExa.ttf">LexendExa.ttf</file></qresource></RCC>
