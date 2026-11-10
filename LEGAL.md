@@ -14,6 +14,10 @@ Copyright © 2026 The Blue View Group Corporation. See [NOTICE](NOTICE).
 
 The application is provided “as is,” without warranty, subject to the terms of the [license](LICENSE). No uptime, security outcome, compatibility, support, or maintenance is guaranteed. Network and VPN settings can affect connectivity, privacy, and access to workplace resources. Follow your organization's policies and confirm that split tunneling is permitted before using it. Users are responsible for checking their configuration and ensuring that the application is appropriate for their environment.
 
+## Privacy and telemetry
+
+The application does not collect, save, or send telemetry or analytics to its developers. It stores the selected profile and theme locally. NetworkManager stores VPN profiles and usernames, and if you choose to save a password, it is stored in your system keyring. External websites opened from the app and the operator of your VPN server have their own privacy practices.
+
 ## Credentials and networking
 
 The application delegates VPN connections to NetworkManager and OpenVPN. When requested, it saves VPN passwords using the user's Secret Service keyring. The application does not include a VPN service, server, or account; users provide their own configuration and credentials. A VPN connection communicates with the VPN server specified by the profile, and its operation is subject to that server operator's policies. Review the source and your system's settings for details.

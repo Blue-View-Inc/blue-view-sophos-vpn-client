@@ -180,13 +180,23 @@ ApplicationWindow {
         RowLayout {
           Layout.leftMargin: 4; spacing: 7
           ToolButton {
-            Layout.preferredWidth: 24; Layout.preferredHeight: 24
+            Layout.preferredWidth: 38; Layout.preferredHeight: 38
             padding: 2
             Accessible.name: qsTr("Visit BvOs")
             ToolTip.visible: hovered
             ToolTip.text: qsTr("Visit bvos.blueview.ai")
             background: Item {}
-            contentItem: Image { source: window.darkTheme ? "qrc:/blueview-oval.svg" : "qrc:/blueview-oval-light.svg"; fillMode: Image.PreserveAspectFit }
+            contentItem: Item {
+              Rectangle {
+                anchors.fill: parent; anchors.margins: 1; radius: 10; opacity: 0.6
+                gradient: Gradient {
+                  GradientStop { position: 0; color: window.darkTheme ? "#394b3a" : "#e8f0dd" }
+                  GradientStop { position: 1; color: window.darkTheme ? "#1c2820" : "#f6f5f1" }
+                }
+              }
+              Image { anchors.centerIn: parent; anchors.verticalCenterOffset: 2; width: 31; height: 31; opacity: 0.2; source: window.darkTheme ? "qrc:/blueview-oval.svg" : "qrc:/blueview-oval-light.svg"; fillMode: Image.PreserveAspectFit }
+              Image { anchors.centerIn: parent; width: 31; height: 31; source: window.darkTheme ? "qrc:/blueview-oval.svg" : "qrc:/blueview-oval-light.svg"; fillMode: Image.PreserveAspectFit }
+            }
             onClicked: Qt.openUrlExternally("https://bvos.blueview.ai")
           }
           ColumnLayout {
@@ -339,6 +349,7 @@ ApplicationWindow {
       ColumnLayout {
         Layout.fillWidth: true; spacing: 2
         Label { text: qsTr("An independent, free-to-use community application. Not affiliated with or endorsed by Sophos."); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+        Label { text: qsTr("This app collects and sends no telemetry."); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
         Label { text: qsTr("Powered by BvOs Intelligence  ·  © 2026 The Blue View Group Corporation"); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
         Label {
           Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; bottomPadding: 2; font.pixelSize: 9
