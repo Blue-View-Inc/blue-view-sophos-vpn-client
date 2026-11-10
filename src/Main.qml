@@ -8,7 +8,7 @@ import QtCore
 ApplicationWindow {
   id: window
   width: 420; height: 600; minimumWidth: 360; minimumHeight: 400
-  visible: true; title: qsTr("Blue View VPN")
+  visible: true; title: qsTr("Blue View Sophos VPN Client")
   Settings { id: preferences; category: "appearance"; property bool darkTheme: false }
   readonly property bool darkTheme: preferences.darkTheme
   readonly property color ink: darkTheme ? "#e6e8df" : "#1d2f14"
@@ -57,12 +57,17 @@ ApplicationWindow {
   }
   property bool connected: false
   property string details: ""
+  property bool detailsView: false
+  property string vpnServer: ""
+  property string vpnInterface: ""
+  property string vpnUser: ""
+  property string vpnSplit: ""
   property string selectedPath: ""
   property var profiles: []
   property string selectedUuid: ""
   function chooseProfile(index) {
     if (index < 0 || index >= profiles.length || profiles[index].id === selectedUuid) return
-    username.text = ""; password.text = ""; lastAction = "select"
+    username.text = ""; password.text = ""; oneTimeCode.text = ""; lastAction = "select"
     backend.request({action: "select", uuid: profiles[index].id})
   }
   property real oldRx: -1
@@ -75,8 +80,8 @@ ApplicationWindow {
   function formatRate(n) { return n < 1024 ? Math.round(n) + " B/s" : n < 1048576 ? (n/1024).toFixed(1) + " KB/s" : (n/1048576).toFixed(1) + " MB/s" }
   function send(action) {
     lastAction = action
-    backend.request({action: action, file: selectedPath, username: username.text, password: password.text, save: remember.checked})
-    if (action === "connect") password.text = ""
+    backend.request({action: action, file: selectedPath, username: username.text, password: password.text, otp: oneTimeCode.text, save: remember.checked})
+    if (action === "connect") { password.text = ""; oneTimeCode.text = "" }
   }
   Component.onCompleted: send("status")
   Timer { interval: 5000; repeat: true; running: window.visible && !backend.busy; onTriggered: { window.lastAction = "status"; backend.request({action:"status"}) } }
@@ -92,6 +97,10 @@ ApplicationWindow {
         for (let i = 0; i < window.profiles.length; i++) if (window.profiles[i].id === window.selectedUuid) index = i
         profilePicker.currentIndex = index
         window.details = data.details || ""
+        window.vpnServer = data.server || ""
+        window.vpnInterface = data.interface || ""
+        window.vpnUser = data.username || ""
+        window.vpnSplit = data.split || ""
         let now = Date.now(), seconds = (now - window.sampledAt) / 1000
         if (data.connected && window.sampledAt > 0 && seconds > 0 && data.rx >= window.oldRx && data.tx >= window.oldTx)
           window.speed = qsTr("↓ %1   ↑ %2").arg(window.formatRate((data.rx - window.oldRx) / seconds)).arg(window.formatRate((data.tx - window.oldTx) / seconds))
@@ -105,6 +114,13 @@ ApplicationWindow {
         Qt.callLater(function() { backend.request({action:"status"}) })
       }
     }
+  }
+  Dialog {
+    id: forgetDialog; parent: Overlay.overlay; anchors.centerIn: parent; modal: true
+    title: qsTr("Remove saved password?")
+    standardButtons: Dialog.Yes | Dialog.Cancel
+    onAccepted: window.send("forget")
+    Label { text: qsTr("Remove the saved password for the selected profile from your keyring?"); color: window.ink; wrapMode: Text.Wrap; width: Math.min(window.width - 80, 300) }
   }
   FileDialog { id: picker; title: qsTr("Choose an OpenVPN configuration"); nameFilters: [qsTr("OpenVPN configurations (*.ovpn)")]; onAccepted: window.selectedPath = backend.localPath(selectedFile) }
   Dialog {
@@ -212,6 +228,21 @@ ApplicationWindow {
         }
       }
       Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
+      RowLayout {
+        Layout.fillWidth: true; spacing: 3
+        Button {
+          Layout.fillWidth: true; Layout.preferredHeight: 30; flat: true
+          text: qsTr("Connection"); font.weight: window.detailsView ? Font.Normal : Font.DemiBold
+          background: Rectangle { radius: 7; color: !window.detailsView ? (window.darkTheme ? "#304438" : "#dfe9da") : "transparent" }
+          onClicked: window.detailsView = false
+        }
+        Button {
+          Layout.fillWidth: true; Layout.preferredHeight: 30; flat: true
+          text: qsTr("Details"); font.weight: window.detailsView ? Font.DemiBold : Font.Normal
+          background: Rectangle { radius: 7; color: window.detailsView ? (window.darkTheme ? "#304438" : "#dfe9da") : "transparent" }
+          onClicked: window.detailsView = true
+        }
+      }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 3
         Label { text: qsTr("VPN PROFILE"); font.pixelSize: 10; font.letterSpacing: 1; color: window.muted }
@@ -243,13 +274,13 @@ ApplicationWindow {
             ColumnLayout {
               spacing: 1; Layout.fillWidth: true
               Label { text: window.connected ? qsTr("Connected") : qsTr("Disconnected"); font.bold: true; font.pixelSize: 16; color: window.ink }
-              Label { text: qsTr("Sophos / OpenVPN · Split tunnel"); color: window.muted; font.pixelSize: 12 }
+              Label { text: window.vpnSplit === "yes" ? qsTr("Sophos / OpenVPN · Split tunnel") : qsTr("Sophos / OpenVPN"); color: window.muted; font.pixelSize: 12 }
             }
             BusyIndicator { running: backend.busy; visible: running; Layout.preferredWidth: 32; Layout.preferredHeight: 32 }
           }
           Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
           ColumnLayout {
-            Layout.fillWidth: true; visible: window.connected; spacing: 3
+            Layout.fillWidth: true; visible: window.connected && !window.detailsView; spacing: 3
             ColumnLayout {
               Layout.fillWidth: true; spacing: 3
               Label { text: qsTr("VPN ADDRESS & DNS"); font.pixelSize: 10; font.letterSpacing: 1; color: window.muted }
@@ -285,18 +316,29 @@ ApplicationWindow {
         }
       }
       ColumnLayout {
-        Layout.fillWidth: true; spacing: 2; visible: !window.connected
+        Layout.fillWidth: true; spacing: 2; visible: !window.connected && !window.detailsView
         Label { text: qsTr("Sign in"); font.family: "Manrope"; font.pixelSize: 14; font.bold: true; color: window.ink }
-        CredentialField { id: username; placeholderText: qsTr("VPN username (optional)"); enabled: !backend.busy; ToolTip.visible: hovered; ToolTip.text: qsTr("Username supplied by your VPN administrator") }
+        RowLayout {
+          Layout.fillWidth: true; spacing: 5
+          CredentialField { id: username; Layout.preferredWidth: 1; Layout.minimumWidth: 0; placeholderText: qsTr("Username (optional)"); enabled: !backend.busy; ToolTip.visible: hovered; ToolTip.text: qsTr("Username supplied by your VPN administrator") }
+          CredentialField {
+            id: oneTimeCode; Layout.preferredWidth: 1; Layout.minimumWidth: 0; placeholderText: qsTr("One-time code"); enabled: !backend.busy
+            echoMode: TextInput.Password; inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhSensitiveData; maximumLength: 12
+            ToolTip.visible: hovered; ToolTip.text: qsTr("Enter a code from your authenticator or hardware token; it is never saved")
+            onAccepted: if (!backend.busy) window.send("connect")
+          }
+        }
         CredentialField { id: password; placeholderText: qsTr("Password (or use saved password)"); echoMode: TextInput.Password; enabled: !backend.busy; ToolTip.visible: hovered; ToolTip.text: qsTr("Leave blank to use a password saved in your keyring"); onAccepted: if (!backend.busy) window.send("connect") }
-        Switch {
+        RowLayout {
+          Layout.fillWidth: true; spacing: 4
+          Switch {
           id: remember
           Layout.fillWidth: true; Layout.preferredHeight: 40
-          checked: true; enabled: !backend.busy
+          checked: false; enabled: !backend.busy
           text: qsTr("Save password")
           Accessible.name: qsTr("Save password in system keyring")
           ToolTip.visible: hovered
-          ToolTip.text: qsTr("Store the password in your system keyring after connecting successfully")
+          ToolTip.text: qsTr("Store the password in your keyring after a successful connection. Keep one-time codes in their own field.")
           padding: 0; leftPadding: 8; rightPadding: 8
           background: Rectangle {
             radius: 8
@@ -316,11 +358,20 @@ ApplicationWindow {
             color: remember.checked ? (window.darkTheme ? "#9fc57e" : "#356b19") : (window.darkTheme ? "#506052" : "#adb6aa")
             Rectangle { width: 14; height: 14; radius: 7; y: 3; x: remember.checked ? parent.width - width - 3 : 3; color: "#ffffff" }
           }
+          }
+          ToolButton {
+            Layout.preferredWidth: 55; Layout.preferredHeight: 40
+            text: qsTr("Forget"); font.pixelSize: 11
+            enabled: !backend.busy && window.selectedUuid !== ""
+            Accessible.name: qsTr("Forget saved password")
+            ToolTip.visible: hovered; ToolTip.text: qsTr("Remove the selected profile's password from your keyring")
+            onClicked: forgetDialog.open()
+          }
         }
       }
       Button {
         id: importButton
-        Layout.fillWidth: true; Layout.preferredHeight: 40; enabled: !backend.busy && !window.connected
+        Layout.fillWidth: true; Layout.preferredHeight: 40; visible: !window.detailsView; enabled: !backend.busy && !window.connected
         text: qsTr("Import VPN configuration")
         ToolTip.visible: hovered
         ToolTip.text: qsTr("Add a profile from an OpenVPN configuration file")
@@ -343,18 +394,37 @@ ApplicationWindow {
         }
         onClicked: importDialog.open()
       }
+      ColumnLayout {
+        visible: window.detailsView; Layout.fillWidth: true; spacing: 6
+        Label { text: qsTr("Connection details"); font.family: "Manrope"; font.pixelSize: 14; font.bold: true; color: window.ink }
+        Repeater {
+          model: [
+            { label: qsTr("Server"), value: window.vpnServer || qsTr("Not available") },
+            { label: qsTr("VPN user"), value: window.vpnUser || qsTr("System default") },
+            { label: qsTr("VPN address & DNS"), value: window.connected ? (window.details || qsTr("Not available")) : qsTr("Connect to view") },
+            { label: qsTr("Interface"), value: window.connected ? (window.vpnInterface || qsTr("Not available")) : qsTr("Connect to view") },
+            { label: qsTr("Live traffic"), value: window.connected ? (window.speed || qsTr("Calculating…")) : qsTr("Connect to view") },
+            { label: qsTr("IPv4 routing"), value: window.vpnSplit === "yes" ? qsTr("Split tunnel") : (window.vpnSplit === "no" ? qsTr("Default route allowed") : qsTr("Not available")) }
+          ]
+          RowLayout {
+            Layout.fillWidth: true; spacing: 8
+            Label { Layout.preferredWidth: 112; text: modelData.label; color: window.muted; font.pixelSize: 11; textFormat: Text.PlainText }
+            Label { Layout.fillWidth: true; text: modelData.value; color: window.ink; font.pixelSize: 11; textFormat: Text.PlainText; wrapMode: Text.Wrap }
+          }
+        }
+      }
       Label { visible: text !== ""; text: window.notice; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.fillWidth: true; color: window.ink }
       Item { Layout.fillHeight: true; Layout.minimumHeight: 0 }
       Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 2
         Label { text: qsTr("An independent, free-to-use community application. Not affiliated with or endorsed by Sophos."); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
-        Label { text: qsTr("This app collects and sends no telemetry."); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+        Label { text: qsTr("No tracking. No analytics. No telemetry."); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
         Label { text: qsTr("Powered by BvOs Intelligence  ·  © 2026 The Blue View Group Corporation"); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
         Label {
           Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; bottomPadding: 2; font.pixelSize: 9
           textFormat: Text.RichText
-          text: '<a href="https://github.com/Blue-View-Inc/blueview-vpn/blob/master/LEGAL.md" style="color:' + (window.darkTheme ? '#81c4ff' : '#2861b8') + '">' + qsTr("Legal and license information") + '</a>'
+          text: '<a href="https://github.com/Blue-View-Inc/blue-view-sophos-vpn-client/blob/master/LEGAL.md" style="color:' + (window.darkTheme ? '#81c4ff' : '#2861b8') + '">' + qsTr("Legal and license information") + '</a>'
           onLinkActivated: function(link) { Qt.openUrlExternally(link) }
         }
       }

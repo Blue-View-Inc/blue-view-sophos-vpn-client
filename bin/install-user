@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+"$root/bin/build"
+install -Dm755 "$root/build/sophosvpn" "$HOME/.local/bin/sophosvpn"
+install -Dm755 "$root/build/sophosvpn-backend" "$HOME/.local/bin/sophosvpn-backend"
+install -Dm644 "$root/src/blueviewvpn.svg" "$HOME/.local/share/icons/hicolor/scalable/apps/sophosvpn.svg"
+python3 - <<'PY'
+from pathlib import Path
+home = Path.home()
+executable = str(home / '.local/bin/sophosvpn').replace('\\', '\\\\').replace('"', '\\"').replace('%', '%%')
+entry = home / '.local/share/applications/sophosvpn.desktop'
+entry.parent.mkdir(parents=True, exist_ok=True)
+entry.write_text('[Desktop Entry]\nType=Application\nName=Blue View Sophos VPN Client\nComment=Independent community VPN client\nExec="' + executable + '"\nIcon=sophosvpn\nTerminal=false\nCategories=Network;Security;\nStartupWMClass=sophosvpn\n')
+PY
+if command -v update-desktop-database >/dev/null 2>&1; then update-desktop-database "$HOME/.local/share/applications" || :; fi
+printf '%s\n' 'Installed for this user. Open Blue View Sophos VPN Client from your application launcher.'

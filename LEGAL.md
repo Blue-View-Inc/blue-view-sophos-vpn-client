@@ -2,7 +2,7 @@
 
 ## Independent community project
 
-Blue View VPN is a free-to-use community application developed by The Blue View Group Corporation. It is an independent project and is not affiliated with, endorsed by, sponsored by, or supported by Sophos. Sophos and the Sophos logo are trademarks or registered trademarks of Sophos Limited or its affiliates. All other trademarks belong to their respective owners. Use of a trademark identifies compatibility and does not imply affiliation or endorsement.
+Blue View Sophos VPN Client is a free-to-use community application developed by The Blue View Group Corporation. It is an independent project and is not affiliated with, endorsed by, sponsored by, or supported by Sophos. Sophos and the Sophos logo are trademarks or registered trademarks of Sophos Limited or its affiliates. All other trademarks belong to their respective owners. Use of a trademark identifies compatibility and does not imply affiliation or endorsement.
 
 ## License and cost
 

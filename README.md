@@ -1,4 +1,6 @@
-# Blue View VPN
+# Blue View Sophos VPN Client
+
+![Blue View Sophos VPN Client with a fictional example profile](docs/screenshot.png)
 
 A Linux desktop client for Sophos-compatible OpenVPN profiles, by Blue View Intelligence and powered by BvOs Intelligence. A Qt Quick interface uses a Rust backend and NetworkManager to import a profile, connect or disconnect, and display tunnel status and traffic rates. Passwords can be saved in the user's Secret Service keyring.
 
@@ -13,19 +15,25 @@ bin/build
 build/sophosvpn
 ```
 
+To install the built app and launcher entry for the current user, run `bin/install-user`.
+
 The build uses Cargo offline; ensure the Rust dependencies in `backend/Cargo.lock` are cached first, or run `cargo fetch --manifest-path backend/Cargo.toml` when online. Press Ctrl+Q to quit.
 
 ## Usage
 
-Select **Import VPN configuration**, choose the `.ovpn` file supplied by your organization, then import it. Enter your VPN username and password and select **Connect VPN**. The application saves the password to the desktop keyring when requested after a successful connection. Profile import creates a separate NetworkManager profile with split tunneling enabled. DNS and network routes are supplied by the VPN configuration and server; check your organization's VPN policy and test access after importing.
+Select **Import VPN configuration**, choose the `.ovpn` file supplied by your organization, then import it. Enter your VPN username and password and, if required, a one-time code from your authenticator or hardware token; then select **Connect VPN**. One-time codes are not saved. The app does not directly support FIDO2 security keys or Keeper integration. The application saves the password to the desktop keyring only when you enable the save option and the connection succeeds. Put one-time codes in their separate field, never in the password field when saving the password. Previously saved passwords remain available until you choose to forget them. Profile import creates a separate NetworkManager profile with split tunneling enabled. DNS and network routes are supplied by the VPN configuration and server; check your organization's VPN policy and test access after importing.
 
 Multiple imported profiles remain available in the profile selector, with a separate saved password per profile. Disconnect before switching profiles.
 
-The app does not bundle a VPN configuration or credentials. Existing NetworkManager profiles are not deleted. Only OpenVPN configurations supported by NetworkManager can be imported; configurations that refer to external files may require additional setup.
+The app does not bundle a VPN configuration or credentials. Existing NetworkManager profiles are not deleted. Only OpenVPN configurations supported by NetworkManager can be imported. New imports must specify a trusted CA and a server-certificate check; configurations containing unsupported executable directives or external file references may require a different profile from the administrator. Existing NetworkManager profiles are not revalidated by the importer.
 
 ## Independent community project
 
 This free-to-use community application is not affiliated with, endorsed by, sponsored by, or supported by Sophos. See [legal and community information](LEGAL.md) for trademark, warranty, licensing, and networking disclosures.
+
+## Contributing and security
+
+See [MAINTENANCE.md](MAINTENANCE.md) for release and compatibility plans. See [CONTRIBUTING.md](CONTRIBUTING.md) for development and pull-request guidance and [SECURITY.md](SECURITY.md) for private vulnerability reporting and security limitations.
 
 ## License
 
