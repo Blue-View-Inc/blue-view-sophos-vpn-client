@@ -19,6 +19,7 @@ ApplicationWindow {
   Material.theme: darkTheme ? Material.Dark : Material.Light
   Material.accent: darkTheme ? "#9fc57e" : "#356b19"
   FontLoader { id: sophosHeadingFont; source: "qrc:/LexendExa.ttf" }
+  FontLoader { id: signatureFont; source: "qrc:/Caveat.ttf" }
   component LineIcon: Canvas {
     id: icon
     property string kind: "key"
@@ -188,11 +189,15 @@ ApplicationWindow {
             contentItem: Image { source: window.darkTheme ? "qrc:/blueview-oval.svg" : "qrc:/blueview-oval-light.svg"; fillMode: Image.PreserveAspectFit }
             onClicked: Qt.openUrlExternally("https://bvos.blueview.ai")
           }
-          Label {
-            textFormat: Text.RichText
-            text: '<a href="https://blueview.ai" style="color:' + (window.darkTheme ? '#a9b9a1' : '#356b19') + '">' + qsTr("Powered by BvOs Intelligence") + '</a>'
-            font.pixelSize: 11
-            onLinkActivated: function(link) { Qt.openUrlExternally(link) }
+          ColumnLayout {
+            spacing: -2
+            Label {
+              textFormat: Text.RichText
+              text: '<a href="https://blueview.ai" style="color:' + (window.darkTheme ? '#a9b9a1' : '#356b19') + '">' + qsTr("Powered by BvOs Intelligence") + '</a>'
+              font.pixelSize: 11
+              onLinkActivated: function(link) { Qt.openUrlExternally(link) }
+            }
+            Label { text: qsTr("Naturally Yours"); font.family: signatureFont.name; font.pixelSize: 17; color: window.darkTheme ? "#b5cda8" : "#557748" }
           }
         }
       }

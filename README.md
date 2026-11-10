@@ -33,4 +33,4 @@ Copyright 2026 The Blue View Group Corporation. Source available under the [Poly
 
 Sophos and the Sophos logo are trademarks of Sophos and are not licensed under the project license. Blue View branding is a trademark of The Blue View Group Corporation.
 
-The Lexend Exa typeface is distributed under the [SIL Open Font License 1.1](src/LexendExa-OFL.txt).
+The Lexend Exa and Caveat typefaces are distributed under the SIL Open Font License 1.1; see [Lexend Exa](src/LexendExa-OFL.txt) and [Caveat](src/Caveat-OFL.txt).
