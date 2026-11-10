@@ -46,7 +46,10 @@ ApplicationWindow {
     font.pixelSize: 12
     background: Rectangle {
       radius: 8
-      color: window.darkTheme ? "#1c241e" : "#ffffff"
+      gradient: Gradient {
+        GradientStop { position: 0; color: window.darkTheme ? "#27372d" : "#ffffff" }
+        GradientStop { position: 1; color: window.darkTheme ? "#1b261f" : "#f7f8f5" }
+      }
       border.width: field.activeFocus ? 2 : 1
       border.color: field.activeFocus ? (window.darkTheme ? "#a9c79b" : "#356b19") : window.lineColor
     }
@@ -131,8 +134,35 @@ ApplicationWindow {
         Layout.fillWidth: true; spacing: 0
         RowLayout {
           Layout.fillWidth: true; spacing: 11
-          Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 46; Layout.preferredHeight: 46; fillMode: Image.PreserveAspectFit }
-          Label { text: qsTr("SOPHOS VPN"); font.family: sophosHeadingFont.name; font.pixelSize: 20; font.bold: true; font.letterSpacing: -0.5; color: window.ink; Layout.fillWidth: true }
+          Item {
+            Layout.fillWidth: true; Layout.preferredHeight: 48
+            Accessible.role: Accessible.Graphic
+            Accessible.name: qsTr("Sophos VPN")
+            // The official artwork remains unchanged; layered light gives it depth.
+            Rectangle {
+              x: -6; y: 3; width: Math.min(parent.width, 248); height: 40; radius: 12
+              gradient: Gradient {
+                GradientStop { position: 0; color: window.darkTheme ? "#263e56" : "#e0edff" }
+                GradientStop { position: 1; color: window.darkTheme ? "#142321" : "#f6f5f1" }
+              }
+              opacity: 0.6
+            }
+            Image {
+              x: 1; y: 13; width: Math.min(parent.width - 32, 205); height: 23
+              source: window.darkTheme ? "qrc:/sophos-wordmark-dark.svg" : "qrc:/sophos-wordmark-light.svg"
+              fillMode: Image.PreserveAspectFit; opacity: window.darkTheme ? 0.18 : 0.12
+            }
+            Image {
+              x: 0; y: 11; width: Math.min(parent.width - 32, 205); height: 23
+              source: window.darkTheme ? "qrc:/sophos-wordmark-dark.svg" : "qrc:/sophos-wordmark-light.svg"
+              fillMode: Image.PreserveAspectFit
+            }
+            Text {
+              x: Math.min(parent.width - 27, 212); y: 16
+              text: "VPN"; color: window.muted; font.family: sophosHeadingFont.name
+              font.pixelSize: 10; font.weight: Font.Medium; font.letterSpacing: 0.7
+            }
+          }
           ToolButton {
             id: themeButton
             Accessible.name: window.darkTheme ? qsTr("Switch to light theme") : qsTr("Switch to dark theme")
@@ -180,7 +210,16 @@ ApplicationWindow {
       }
       Rectangle {
         Layout.fillWidth: true; implicitHeight: statusContent.implicitHeight + 16
-        radius: 14; color: window.darkTheme ? "#1c241e" : "#efede6"; border.color: window.lineColor
+        radius: 14; border.color: window.darkTheme ? "#405244" : "#d5d8cb"
+        gradient: Gradient {
+          GradientStop { position: 0; color: window.darkTheme ? "#26352c" : "#ffffff" }
+          GradientStop { position: 1; color: window.darkTheme ? "#1b261f" : "#ecefe8" }
+        }
+        Rectangle {
+          anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top
+          anchors.leftMargin: 13; anchors.rightMargin: 13; anchors.topMargin: 1
+          height: 1; color: window.darkTheme ? "#557060" : "#ffffff"; opacity: 0.75
+        }
         ColumnLayout {
           id: statusContent; anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 8; spacing: 4
           RowLayout {
