@@ -7,7 +7,7 @@ import QtCore
 
 ApplicationWindow {
   id: window
-  width: 760; height: 780; minimumWidth: 460; minimumHeight: 500
+  width: 420; height: 600; minimumWidth: 360; minimumHeight: 400
   visible: true; title: qsTr("Blue View VPN")
   Settings { id: preferences; category: "appearance"; property bool darkTheme: false }
   readonly property bool darkTheme: preferences.darkTheme
@@ -74,15 +74,15 @@ ApplicationWindow {
     anchors.fill: parent; clip: true
     contentWidth: availableWidth
     ColumnLayout {
-      width: Math.max(0, window.width - 56); x: 28
-      spacing: 18
+      width: Math.max(0, window.width - 32); x: 16
+      spacing: 10
       Item { Layout.preferredHeight: 8 }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 5
         RowLayout {
           Layout.fillWidth: true; spacing: 11
-          Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 46; Layout.preferredHeight: 46; fillMode: Image.PreserveAspectFit }
-          Label { text: qsTr("SOPHOS VPN"); font.family: sophosHeadingFont.name; font.pixelSize: 19; font.bold: true; font.letterSpacing: -0.5; color: window.ink; Layout.fillWidth: true }
+          Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 36; Layout.preferredHeight: 36; fillMode: Image.PreserveAspectFit }
+          Label { text: qsTr("SOPHOS VPN"); font.family: sophosHeadingFont.name; font.pixelSize: 16; font.bold: true; font.letterSpacing: -0.5; color: window.ink; Layout.fillWidth: true }
           ToolButton {
             id: themeButton
             Accessible.name: window.darkTheme ? qsTr("Switch to light theme") : qsTr("Switch to dark theme")
@@ -110,7 +110,7 @@ ApplicationWindow {
           }
           Label {
             textFormat: Text.RichText
-            text: '<a href="https://www.blueview.ai" style="color:' + (window.darkTheme ? '#a9b9a1' : '#356b19') + '">' + qsTr("Powered by BvOs Intelligence") + '</a>'
+            text: '<a href="https://blueview.ai" style="color:' + (window.darkTheme ? '#a9b9a1' : '#356b19') + '">' + qsTr("Powered by BvOs Intelligence") + '</a>'
             font.pixelSize: 11
             onLinkActivated: function(link) { Qt.openUrlExternally(link) }
           }
@@ -119,7 +119,7 @@ ApplicationWindow {
       Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
       ColumnLayout {
         spacing: 3; Layout.topMargin: 2
-        Label { text: qsTr("Your connection"); font.family: "Manrope"; font.pixelSize: 26; font.bold: true; color: window.ink }
+        Label { text: qsTr("Your connection"); font.family: "Manrope"; font.pixelSize: 20; font.bold: true; color: window.ink }
         Label { text: qsTr("Manage secure access to your work network."); font.pixelSize: 13; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
       }
       ColumnLayout {
@@ -134,16 +134,16 @@ ApplicationWindow {
         Label { visible: window.connected && window.profiles.length > 1; text: qsTr("Disconnect to switch profiles."); color: window.muted; font.pixelSize: 11 }
       }
       Rectangle {
-        Layout.fillWidth: true; implicitHeight: statusContent.implicitHeight + 32
+        Layout.fillWidth: true; implicitHeight: statusContent.implicitHeight + 24
         radius: 14; color: window.darkTheme ? "#1c241e" : "#efede6"; border.color: window.lineColor
         ColumnLayout {
-          id: statusContent; anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 16; spacing: 13
+          id: statusContent; anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 12; spacing: 8
           RowLayout {
             Layout.fillWidth: true; spacing: 10
             Rectangle { width: 11; height: 11; radius: 6; color: window.connected ? "#50d6a2" : "#e3a967" }
             ColumnLayout {
               spacing: 1; Layout.fillWidth: true
-              Label { text: window.connected ? qsTr("Connected") : qsTr("Disconnected"); font.bold: true; font.pixelSize: 18; color: window.ink }
+              Label { text: window.connected ? qsTr("Connected") : qsTr("Disconnected"); font.bold: true; font.pixelSize: 16; color: window.ink }
               Label { text: qsTr("Sophos / OpenVPN · Split tunnel"); color: window.muted; font.pixelSize: 12 }
             }
             BusyIndicator { running: backend.busy; visible: running; Layout.preferredWidth: 32; Layout.preferredHeight: 32 }
@@ -171,7 +171,7 @@ ApplicationWindow {
       }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 5; visible: !window.connected
-        Label { text: qsTr("Sign in"); font.family: "Manrope"; font.pixelSize: 17; font.bold: true; color: "#edf5fc" }
+        Label { text: qsTr("Sign in"); font.family: "Manrope"; font.pixelSize: 17; font.bold: true; color: window.ink }
         Label { text: qsTr("Use your work VPN credentials. A saved password can be used here."); color: window.muted; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
         TextField { id: username; placeholderText: qsTr("VPN username (optional)"); Layout.fillWidth: true; enabled: !backend.busy }
         TextField { id: password; placeholderText: qsTr("Password (or use saved password)"); echoMode: TextInput.Password; Layout.fillWidth: true; enabled: !backend.busy; onAccepted: if (!backend.busy) window.send("connect") }
