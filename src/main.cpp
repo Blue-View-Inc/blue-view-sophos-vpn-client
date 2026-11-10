@@ -40,7 +40,7 @@ private:
   QProcess process;
 };
 int main(int argc, char **argv) {
-  QGuiApplication app(argc, argv); app.setApplicationName("Sophos VPN"); app.setDesktopFileName("sophosvpn");
+  QGuiApplication app(argc, argv); app.setOrganizationName("Blue View Intelligence"); app.setOrganizationDomain("blueview.ai"); app.setApplicationName("Sophos VPN"); app.setDesktopFileName("sophosvpn");
   Backend backend; QQmlApplicationEngine engine; engine.rootContext()->setContextProperty("backend", &backend);
   engine.load(QUrl("qrc:/Main.qml")); if (engine.rootObjects().isEmpty()) return 1; return app.exec();
 }

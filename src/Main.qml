@@ -3,15 +3,21 @@ import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Layouts
 import QtQuick.Dialogs
+import QtCore
 
 ApplicationWindow {
   id: window
   width: 760; height: 780; minimumWidth: 460; minimumHeight: 500
   visible: true; title: qsTr("Blue View VPN")
-  color: "#141a16"
+  Settings { id: preferences; category: "appearance"; property bool darkTheme: false }
+  readonly property bool darkTheme: preferences.darkTheme
+  readonly property color ink: darkTheme ? "#e6e8df" : "#1d2f14"
+  readonly property color muted: darkTheme ? "#9fab99" : "#55644c"
+  readonly property color lineColor: darkTheme ? "#31402f" : "#d6d2c8"
+  color: darkTheme ? "#141a16" : "#f6f5f1"
   font.family: "Inter"
-  Material.theme: Material.Dark
-  Material.accent: "#9fc57e"
+  Material.theme: darkTheme ? Material.Dark : Material.Light
+  Material.accent: darkTheme ? "#9fc57e" : "#356b19"
   property bool connected: false
   property string details: ""
   property string selectedPath: ""
@@ -75,34 +81,53 @@ ApplicationWindow {
         RowLayout {
           Layout.fillWidth: true; spacing: 11
           Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 46; Layout.preferredHeight: 46; fillMode: Image.PreserveAspectFit }
-          Label { text: qsTr("SOPHOS VPN"); font.pixelSize: 20; font.bold: true; font.letterSpacing: 1; color: "#e6e8df"; Layout.fillWidth: true }
+          Label { text: qsTr("SOPHOS VPN"); font.pixelSize: 20; font.bold: true; font.letterSpacing: 1; color: window.ink; Layout.fillWidth: true }
+          ToolButton {
+            text: window.darkTheme ? qsTr("Light") : qsTr("Dark")
+            Accessible.name: window.darkTheme ? qsTr("Switch to light theme") : qsTr("Switch to dark theme")
+            onClicked: preferences.darkTheme = !preferences.darkTheme
+          }
         }
         RowLayout {
           Layout.leftMargin: 4; spacing: 7
-          Image { source: "qrc:/blueview-oval.svg"; Layout.preferredWidth: 19; Layout.preferredHeight: 20; fillMode: Image.PreserveAspectFit }
-          Label { text: qsTr("By Blue View Intelligence"); font.pixelSize: 11; color: "#a9b9a1" }
+          ToolButton {
+            Layout.preferredWidth: 24; Layout.preferredHeight: 24
+            padding: 2
+            Accessible.name: qsTr("Visit BvOs")
+            ToolTip.visible: hovered
+            ToolTip.text: qsTr("Visit bvos.blueview.ai")
+            background: Item {}
+            contentItem: Image { source: window.darkTheme ? "qrc:/blueview-oval.svg" : "qrc:/blueview-oval-light.svg"; fillMode: Image.PreserveAspectFit }
+            onClicked: Qt.openUrlExternally("https://bvos.blueview.ai")
+          }
+          Label {
+            textFormat: Text.RichText
+            text: '<a href="https://www.blueview.ai" style="color:' + (window.darkTheme ? '#a9b9a1' : '#356b19') + '">' + qsTr("Powered by BvOs Intelligence") + '</a>'
+            font.pixelSize: 11
+            onLinkActivated: function(link) { Qt.openUrlExternally(link) }
+          }
         }
       }
-      Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: "#31402f" }
+      Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
       ColumnLayout {
         spacing: 3; Layout.topMargin: 2
-        Label { text: qsTr("Your connection"); font.family: "Manrope"; font.pixelSize: 26; font.bold: true; color: "#e6e8df" }
-        Label { text: qsTr("Manage secure access to your work network."); font.pixelSize: 13; color: "#9fab99"; wrapMode: Text.Wrap; Layout.fillWidth: true }
+        Label { text: qsTr("Your connection"); font.family: "Manrope"; font.pixelSize: 26; font.bold: true; color: window.ink }
+        Label { text: qsTr("Manage secure access to your work network."); font.pixelSize: 13; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
       }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 3
-        Label { text: qsTr("VPN PROFILE"); font.pixelSize: 10; font.letterSpacing: 1; color: "#9fab99" }
+        Label { text: qsTr("VPN PROFILE"); font.pixelSize: 10; font.letterSpacing: 1; color: window.muted }
         ComboBox {
           id: profilePicker; Layout.fillWidth: true; model: window.profiles; textRole: "name"
           enabled: !backend.busy && !window.connected && window.profiles.length > 0
           onActivated: function(index) { window.chooseProfile(index) }
           displayText: currentIndex < 0 ? qsTr("Import a VPN configuration to get started") : currentText
         }
-        Label { visible: window.connected && window.profiles.length > 1; text: qsTr("Disconnect to switch profiles."); color: "#9fab99"; font.pixelSize: 11 }
+        Label { visible: window.connected && window.profiles.length > 1; text: qsTr("Disconnect to switch profiles."); color: window.muted; font.pixelSize: 11 }
       }
       Rectangle {
         Layout.fillWidth: true; implicitHeight: statusContent.implicitHeight + 32
-        radius: 14; color: "#1c241e"; border.color: "#31402f"
+        radius: 14; color: window.darkTheme ? "#1c241e" : "#efede6"; border.color: window.lineColor
         ColumnLayout {
           id: statusContent; anchors.left: parent.left; anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 16; spacing: 13
           RowLayout {
@@ -110,23 +135,23 @@ ApplicationWindow {
             Rectangle { width: 11; height: 11; radius: 6; color: window.connected ? "#50d6a2" : "#e3a967" }
             ColumnLayout {
               spacing: 1; Layout.fillWidth: true
-              Label { text: window.connected ? qsTr("Connected") : qsTr("Disconnected"); font.bold: true; font.pixelSize: 18; color: "#e6e8df" }
-              Label { text: qsTr("Sophos / OpenVPN · Split tunnel"); color: "#9fab99"; font.pixelSize: 12 }
+              Label { text: window.connected ? qsTr("Connected") : qsTr("Disconnected"); font.bold: true; font.pixelSize: 18; color: window.ink }
+              Label { text: qsTr("Sophos / OpenVPN · Split tunnel"); color: window.muted; font.pixelSize: 12 }
             }
             BusyIndicator { running: backend.busy; visible: running; Layout.preferredWidth: 32; Layout.preferredHeight: 32 }
           }
-          Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: "#31402f" }
+          Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
           ColumnLayout {
             Layout.fillWidth: true; visible: window.connected; spacing: 10
             ColumnLayout {
               Layout.fillWidth: true; spacing: 3
-              Label { text: qsTr("VPN ADDRESS & DNS"); font.pixelSize: 10; font.letterSpacing: 1; color: "#9fab99" }
-              Label { text: window.details || "—"; textFormat: Text.PlainText; color: "#e6e8df"; font.pixelSize: 13; wrapMode: Text.Wrap; Layout.fillWidth: true }
+              Label { text: qsTr("VPN ADDRESS & DNS"); font.pixelSize: 10; font.letterSpacing: 1; color: window.muted }
+              Label { text: window.details || "—"; textFormat: Text.PlainText; color: window.ink; font.pixelSize: 13; wrapMode: Text.Wrap; Layout.fillWidth: true }
             }
             ColumnLayout {
               spacing: 3; Layout.fillWidth: true
-              Label { text: qsTr("LIVE TRAFFIC"); font.pixelSize: 10; font.letterSpacing: 1; color: "#9fab99" }
-              Label { text: window.speed || "—"; color: "#e6e8df"; font.pixelSize: 13; Layout.fillWidth: true; elide: Text.ElideRight }
+              Label { text: qsTr("LIVE TRAFFIC"); font.pixelSize: 10; font.letterSpacing: 1; color: window.muted }
+              Label { text: window.speed || "—"; color: window.ink; font.pixelSize: 13; Layout.fillWidth: true; elide: Text.ElideRight }
             }
           }
           Button {
@@ -139,7 +164,7 @@ ApplicationWindow {
       ColumnLayout {
         Layout.fillWidth: true; spacing: 5; visible: !window.connected
         Label { text: qsTr("Sign in"); font.family: "Manrope"; font.pixelSize: 17; font.bold: true; color: "#edf5fc" }
-        Label { text: qsTr("Use your work VPN credentials. A saved password can be used here."); color: "#9fab99"; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
+        Label { text: qsTr("Use your work VPN credentials. A saved password can be used here."); color: window.muted; font.pixelSize: 12; wrapMode: Text.Wrap; Layout.fillWidth: true }
         TextField { id: username; placeholderText: qsTr("VPN username (optional)"); Layout.fillWidth: true; enabled: !backend.busy }
         TextField { id: password; placeholderText: qsTr("Password (or use saved password)"); echoMode: TextInput.Password; Layout.fillWidth: true; enabled: !backend.busy; onAccepted: if (!backend.busy) window.send("connect") }
         CheckBox { id: remember; text: qsTr("Save password in keyring"); checked: true; enabled: !backend.busy }
@@ -151,25 +176,25 @@ ApplicationWindow {
       }
       ColumnLayout {
         visible: window.setupVisible; Layout.fillWidth: true; spacing: 8
-        Label { text: qsTr("Choose the .ovpn file provided by your organization."); color: "#9fab99"; wrapMode: Text.Wrap; Layout.fillWidth: true }
+        Label { text: qsTr("Choose the .ovpn file provided by your organization."); color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
         RowLayout {
           Layout.fillWidth: true
           Button { text: qsTr("Choose file…"); enabled: !backend.busy && !window.connected; onClicked: picker.open() }
-          Label { text: window.selectedPath || qsTr("No file selected"); textFormat: Text.PlainText; elide: Text.ElideMiddle; color: "#9fab99"; Layout.fillWidth: true }
+          Label { text: window.selectedPath || qsTr("No file selected"); textFormat: Text.PlainText; elide: Text.ElideMiddle; color: window.muted; Layout.fillWidth: true }
         }
         Button { text: qsTr("Import profile"); enabled: window.selectedPath !== "" && !backend.busy && !window.connected; onClicked: window.send("import") }
       }
-      Label { visible: text !== ""; text: window.notice; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.fillWidth: true; color: "#e6e8df" }
+      Label { visible: text !== ""; text: window.notice; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.fillWidth: true; color: window.ink }
       Item { Layout.fillHeight: true; Layout.minimumHeight: 8 }
-      Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: "#31402f" }
+      Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 5
-        Label { text: qsTr("An independent, free-to-use community application. Not affiliated with or endorsed by Sophos."); font.pixelSize: 11; color: "#9fab99"; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
-        Label { text: qsTr("Powered by BvOs Intelligence  ·  © 2026 The Blue View Group Corporation"); font.pixelSize: 11; color: "#9fab99"; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+        Label { text: qsTr("An independent, free-to-use community application. Not affiliated with or endorsed by Sophos."); font.pixelSize: 11; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+        Label { text: qsTr("Powered by BvOs Intelligence  ·  © 2026 The Blue View Group Corporation"); font.pixelSize: 11; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
         Label {
           Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; bottomPadding: 16
           textFormat: Text.RichText
-          text: '<a href="https://github.com/Blue-View-Inc/blueview-vpn/blob/master/LEGAL.md" style="color:#81c4ff">' + qsTr("Legal and license information") + '</a>'
+          text: '<a href="https://github.com/Blue-View-Inc/blueview-vpn/blob/master/LEGAL.md" style="color:' + (window.darkTheme ? '#81c4ff' : '#2861b8') + '">' + qsTr("Legal and license information") + '</a>'
           onLinkActivated: function(link) { Qt.openUrlExternally(link) }
         }
       }
