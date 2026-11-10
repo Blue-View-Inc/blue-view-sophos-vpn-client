@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cargo build --offline --release --manifest-path "$root/backend/Cargo.toml"
+mkdir -p "$root/build"
+cd "$root/build"
+qmake6 "$root/sophosvpn.pro"
+make -j"$(nproc)"
+cp "$root/backend/target/release/sophosvpn-backend" "$root/build/"
