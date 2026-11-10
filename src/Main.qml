@@ -92,15 +92,15 @@ ApplicationWindow {
     anchors.fill: parent; clip: true
     contentWidth: availableWidth
     ColumnLayout {
-      width: Math.max(0, window.width - 32); x: 16
+      width: Math.max(0, window.width - 32); height: Math.max(window.height, implicitHeight); x: 16
       spacing: 5
       Item { Layout.preferredHeight: 2 }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 0
         RowLayout {
           Layout.fillWidth: true; spacing: 11
-          Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 30; Layout.preferredHeight: 30; fillMode: Image.PreserveAspectFit }
-          Label { text: qsTr("SOPHOS VPN"); font.family: sophosHeadingFont.name; font.pixelSize: 16; font.bold: true; font.letterSpacing: -0.5; color: window.ink; Layout.fillWidth: true }
+          Image { source: "qrc:/sophos.svg"; Layout.preferredWidth: 46; Layout.preferredHeight: 46; fillMode: Image.PreserveAspectFit }
+          Label { text: qsTr("SOPHOS VPN"); font.family: sophosHeadingFont.name; font.pixelSize: 20; font.bold: true; font.letterSpacing: -0.5; color: window.ink; Layout.fillWidth: true }
           ToolButton {
             id: themeButton
             Accessible.name: window.darkTheme ? qsTr("Switch to light theme") : qsTr("Switch to dark theme")
@@ -199,10 +199,10 @@ ApplicationWindow {
       Rectangle { Layout.fillWidth: true; Layout.preferredHeight: 1; color: window.lineColor }
       ColumnLayout {
         Layout.fillWidth: true; spacing: 2
-        Label { text: qsTr("An independent, free-to-use community application. Not affiliated with or endorsed by Sophos."); font.pixelSize: 11; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
-        Label { text: qsTr("Powered by BvOs Intelligence  ·  © 2026 The Blue View Group Corporation"); font.pixelSize: 11; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+        Label { text: qsTr("An independent, free-to-use community application. Not affiliated with or endorsed by Sophos."); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
+        Label { text: qsTr("Powered by BvOs Intelligence  ·  © 2026 The Blue View Group Corporation"); font.pixelSize: 9; color: window.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter }
         Label {
-          Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; bottomPadding: 4
+          Layout.fillWidth: true; horizontalAlignment: Text.AlignHCenter; bottomPadding: 2; font.pixelSize: 9
           textFormat: Text.RichText
           text: '<a href="https://github.com/Blue-View-Inc/blueview-vpn/blob/master/LEGAL.md" style="color:' + (window.darkTheme ? '#81c4ff' : '#2861b8') + '">' + qsTr("Legal and license information") + '</a>'
           onLinkActivated: function(link) { Qt.openUrlExternally(link) }
