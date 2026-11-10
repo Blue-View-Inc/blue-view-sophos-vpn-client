@@ -19,6 +19,38 @@ ApplicationWindow {
   Material.theme: darkTheme ? Material.Dark : Material.Light
   Material.accent: darkTheme ? "#9fc57e" : "#356b19"
   FontLoader { id: sophosHeadingFont; source: "qrc:/LexendExa.ttf" }
+  component LineIcon: Canvas {
+    id: icon
+    property string kind: "key"
+    property color strokeColor: window.darkTheme ? "#a9c79b" : "#547847"
+    implicitWidth: 18; implicitHeight: 18
+    onStrokeColorChanged: requestPaint()
+    onPaint: {
+      const c = getContext("2d"); c.reset(); c.strokeStyle = strokeColor
+      c.lineWidth = 1.6; c.lineCap = "round"; c.lineJoin = "round"
+      if (kind === "key") {
+        c.beginPath(); c.arc(6, 7, 3, 0, 2 * Math.PI); c.stroke()
+        c.beginPath(); c.moveTo(8.5, 9.5); c.lineTo(14, 15); c.moveTo(11.5, 12.5); c.lineTo(13, 11); c.moveTo(13, 14); c.lineTo(14.5, 12.5); c.stroke()
+      } else {
+        c.beginPath(); c.moveTo(3, 3); c.lineTo(11, 3); c.lineTo(15, 7); c.lineTo(15, 15); c.lineTo(3, 15); c.closePath(); c.stroke()
+        c.beginPath(); c.moveTo(10.5, 3.5); c.lineTo(10.5, 7.5); c.lineTo(14.5, 7.5); c.moveTo(6, 11); c.lineTo(12, 11); c.moveTo(9, 8.5); c.lineTo(9, 13.5); c.stroke()
+      }
+    }
+  }
+  component CredentialField: TextField {
+    id: field
+    Layout.fillWidth: true; Layout.preferredHeight: 40
+    leftPadding: 11; rightPadding: 11; topPadding: 4; bottomPadding: 4
+    color: window.ink
+    placeholderTextColor: window.darkTheme ? "#87998a" : "#879484"
+    font.pixelSize: 12
+    background: Rectangle {
+      radius: 8
+      color: window.darkTheme ? "#1c241e" : "#ffffff"
+      border.width: field.activeFocus ? 2 : 1
+      border.color: field.activeFocus ? (window.darkTheme ? "#a9c79b" : "#356b19") : window.lineColor
+    }
+  }
   property bool connected: false
   property string details: ""
   property string selectedPath: ""
@@ -176,8 +208,24 @@ ApplicationWindow {
             }
           }
           Button {
-            Layout.fillWidth: true; Layout.preferredHeight: 36; highlighted: !window.connected; enabled: !backend.busy && window.selectedUuid !== ""
+            id: connectionButton
+            Layout.fillWidth: true; Layout.preferredHeight: 38; enabled: !backend.busy && window.selectedUuid !== ""
             text: window.connected ? qsTr("Disconnect VPN") : qsTr("Connect VPN")
+            ToolTip.visible: hovered
+            ToolTip.text: window.connected ? qsTr("Disconnect this VPN profile") : qsTr("Connect using the selected profile")
+            background: Rectangle {
+              radius: 8
+              color: !connectionButton.enabled ? (window.darkTheme ? "#303c33" : "#d9ddd5") : window.connected
+                     ? (connectionButton.down ? (window.darkTheme ? "#33483a" : "#d7e0d2") : (window.darkTheme ? "#26372d" : "#e5ebe1"))
+                     : (connectionButton.down ? "#285814" : (connectionButton.hovered ? "#427d27" : "#356b19"))
+              border.width: connectionButton.activeFocus ? 2 : 1
+              border.color: connectionButton.activeFocus ? (window.darkTheme ? "#c0e3ad" : "#356b19") : (window.connected ? window.lineColor : "transparent")
+            }
+            contentItem: Text {
+              text: connectionButton.text; font.family: window.font.family; font.pixelSize: 13; font.weight: Font.DemiBold
+              color: !connectionButton.enabled ? window.muted : (window.connected ? window.ink : "white")
+              horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter
+            }
             onClicked: window.send(window.connected ? "disconnect" : "connect")
           }
         }
@@ -185,13 +233,60 @@ ApplicationWindow {
       ColumnLayout {
         Layout.fillWidth: true; spacing: 2; visible: !window.connected
         Label { text: qsTr("Sign in"); font.family: "Manrope"; font.pixelSize: 14; font.bold: true; color: window.ink }
-        TextField { id: username; placeholderText: qsTr("VPN username (optional)"); Layout.fillWidth: true; Layout.preferredHeight: 40; topPadding: 4; bottomPadding: 4; enabled: !backend.busy }
-        TextField { id: password; placeholderText: qsTr("Password (or use saved password)"); echoMode: TextInput.Password; Layout.fillWidth: true; Layout.preferredHeight: 40; topPadding: 4; bottomPadding: 4; enabled: !backend.busy; onAccepted: if (!backend.busy) window.send("connect") }
-        CheckBox { id: remember; text: qsTr("Save password in keyring"); Layout.preferredHeight: 34; checked: true; enabled: !backend.busy }
+        CredentialField { id: username; placeholderText: qsTr("VPN username (optional)"); enabled: !backend.busy; ToolTip.visible: hovered; ToolTip.text: qsTr("Username supplied by your VPN administrator") }
+        CredentialField { id: password; placeholderText: qsTr("Password (or use saved password)"); echoMode: TextInput.Password; enabled: !backend.busy; ToolTip.visible: hovered; ToolTip.text: qsTr("Leave blank to use a password saved in your keyring"); onAccepted: if (!backend.busy) window.send("connect") }
+        Switch {
+          id: remember
+          Layout.fillWidth: true; Layout.preferredHeight: 40
+          checked: true; enabled: !backend.busy
+          text: qsTr("Save password")
+          Accessible.name: qsTr("Save password in system keyring")
+          ToolTip.visible: hovered
+          ToolTip.text: qsTr("Store the password in your system keyring after connecting successfully")
+          padding: 0; leftPadding: 8; rightPadding: 8
+          background: Rectangle {
+            radius: 8
+            color: remember.hovered ? (window.darkTheme ? "#26362b" : "#e4eadf") : (window.darkTheme ? "#1c241e" : "#f0f1eb")
+            border.color: remember.activeFocus ? (window.darkTheme ? "#a9c79b" : "#356b19") : window.lineColor
+            border.width: remember.activeFocus ? 2 : 1
+          }
+          contentItem: Row {
+            spacing: 8
+            LineIcon { anchors.verticalCenter: parent.verticalCenter; width: 18; height: 18 }
+            Text { anchors.verticalCenter: parent.verticalCenter; text: remember.text; font.family: window.font.family; font.pixelSize: 12; font.weight: Font.Medium; color: window.ink }
+          }
+          indicator: Rectangle {
+            implicitWidth: 34; implicitHeight: 20
+            x: remember.width - width - 10; y: (remember.height - height) / 2
+            radius: height / 2
+            color: remember.checked ? (window.darkTheme ? "#9fc57e" : "#356b19") : (window.darkTheme ? "#506052" : "#adb6aa")
+            Rectangle { width: 14; height: 14; radius: 7; y: 3; x: remember.checked ? parent.width - width - 3 : 3; color: "#ffffff" }
+          }
+        }
       }
       Button {
-        Layout.fillWidth: true; Layout.preferredHeight: 34; flat: true; enabled: !backend.busy && !window.connected
-        text: qsTr("Import VPN configuration  +")
+        id: importButton
+        Layout.fillWidth: true; Layout.preferredHeight: 40; enabled: !backend.busy && !window.connected
+        text: qsTr("Import VPN configuration")
+        ToolTip.visible: hovered
+        ToolTip.text: qsTr("Add a profile from an OpenVPN configuration file")
+        padding: 0; leftPadding: 8; rightPadding: 8
+        background: Rectangle {
+          radius: 8
+          color: importButton.hovered ? (window.darkTheme ? "#26362b" : "#e4eadf") : "transparent"
+          border.color: importButton.activeFocus ? (window.darkTheme ? "#a9c79b" : "#356b19") : window.lineColor
+          border.width: importButton.activeFocus ? 2 : 1
+          opacity: importButton.enabled ? 1 : 0.55
+        }
+        contentItem: Item {
+          opacity: importButton.enabled ? 1 : 0.55
+          Row {
+            anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter; spacing: 8
+            LineIcon { kind: "file"; anchors.verticalCenter: parent.verticalCenter; width: 18; height: 18 }
+            Text { text: importButton.text; anchors.verticalCenter: parent.verticalCenter; font.family: window.font.family; font.pixelSize: 12; font.weight: Font.Medium; color: window.ink }
+          }
+          Text { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: "›"; font.pixelSize: 20; color: window.muted }
+        }
         onClicked: importDialog.open()
       }
       Label { visible: text !== ""; text: window.notice; textFormat: Text.PlainText; wrapMode: Text.Wrap; Layout.fillWidth: true; color: window.ink }
