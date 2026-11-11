@@ -16,9 +16,11 @@ with tempfile.TemporaryDirectory(prefix='blueview-package-test-') as folder:
     desktop = root / 'usr/share/applications/sophosvpn.desktop'
     icon = root / 'usr/share/icons/hicolor/scalable/apps/sophosvpn.svg'
     license_dir = root / 'usr/share/licenses/blue-view-sophos-vpn-client'
-    for path in (binary, backend, desktop, icon, license_dir / 'LICENSE', license_dir / 'NOTICE'):
+    plugin_dir = root / 'usr/share/blue-view-sophos-vpn-client/omarchy/blueview.sophos'
+    installer = root / 'usr/bin/sophosvpn-omarchy-install'
+    for path in (binary, backend, desktop, icon, installer, plugin_dir / 'manifest.json', plugin_dir / 'BarWidget.qml', license_dir / 'LICENSE', license_dir / 'NOTICE'):
         assert path.is_file(), f'missing {path}'
-    assert os.access(binary, os.X_OK) and os.access(backend, os.X_OK)
+    assert os.access(binary, os.X_OK) and os.access(backend, os.X_OK) and os.access(installer, os.X_OK)
     assert 'Exec=sophosvpn' in desktop.read_text()
     result = subprocess.run([str(backend)], input='{"action":"invalid"}\n', text=True, capture_output=True, check=True)
     assert json.loads(result.stdout)['ok'] is False

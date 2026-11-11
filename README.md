@@ -15,7 +15,7 @@ Built by [The Blue View Group Corporation](https://blueview.ai/) and the Neutrin
 
 The original Omarchy setup includes a Sophos icon in the system bar. It shows a connection indicator and opens the compact application when clicked; the network panel can also open it. The app's **Connection** and **Details** tabs provide the controls and information previously shown in the bar card.
 
-The system-bar integration is currently a local Omarchy customization, **not yet included in the repository's installer**. The application itself can also run on other Linux desktops with the dependencies below. Contributions to package and simplify Omarchy integration are welcome.
+The source now includes an optional Omarchy bar plugin for the forthcoming Arch package. Once that package is installed, `sophosvpn-omarchy-install` enables the icon for the current user. The source-only `bin/install-user` installer does not yet install the bar plugin. The application can also run on other Linux desktops with the dependencies below.
 
 ## Requirements
 
