@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+source_dir=/usr/share/blue-view-sophos-vpn-client/omarchy/blueview.sophos
+dest="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/plugins/blueview.sophos"
+command -v omarchy >/dev/null 2>&1 || { printf '%s\n' 'Omarchy is required for this optional bar plugin.' >&2; exit 1; }
+[ -f "$source_dir/manifest.json" ] || { printf '%s\n' 'Install the Arch package before enabling the Omarchy plugin.' >&2; exit 1; }
+if [ -e "$dest" ] || [ -L "$dest" ]; then
+  printf 'Plugin already exists at %s; it was not overwritten.\n' "$dest" >&2
+  exit 1
+fi
+omarchy plugin validate "$source_dir"
+mkdir -p "$(dirname "$dest")"
+cp -R "$source_dir" "$dest"
+if ! omarchy-shell shell rescanPlugins >/dev/null; then
+  printf 'Plugin copied to %s. Rescan the shell and enable blueview.sophos manually.\n' "$dest" >&2
+  exit 1
+fi
+omarchy plugin enable blueview.sophos --section right
+printf '%s\n' 'Sophos VPN bar icon enabled.'

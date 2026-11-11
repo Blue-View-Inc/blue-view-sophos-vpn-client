@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Blue View Sophos VPN Client
+Comment=Independent community VPN client
+Exec=sophosvpn
+Icon=sophosvpn
+Terminal=false
+Categories=Network;Security;
+StartupWMClass=sophosvpn

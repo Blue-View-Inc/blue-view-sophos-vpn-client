@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "blueview.sophos",
+  "name": "Sophos VPN",
+  "version": "0.1.0",
+  "author": "The Blue View Group Corporation",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "description": "Open the Blue View Sophos VPN Client and show the selected profile's connection status.",
+  "kinds": ["bar-widget"],
+  "entryPoints": { "barWidget": "BarWidget.qml" },
+  "barWidget": {
+    "displayName": "Sophos VPN",
+    "description": "Show VPN status and open the VPN client.",
+    "category": "Network",
+    "allowMultiple": false
+  }
+}
