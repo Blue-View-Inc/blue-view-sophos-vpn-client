@@ -251,6 +251,22 @@ ApplicationWindow {
           enabled: !backend.busy && !window.connected && window.profiles.length > 0
           onActivated: function(index) { window.chooseProfile(index) }
           displayText: currentIndex < 0 ? qsTr("Import a VPN configuration to get started") : currentText
+          contentItem: Text {
+            leftPadding: 12; rightPadding: 28
+            text: profilePicker.displayText; textFormat: Text.PlainText
+            color: profilePicker.enabled ? window.ink : window.muted
+            font: profilePicker.font; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight
+          }
+          delegate: ItemDelegate {
+            required property var modelData
+            required property int index
+            width: profilePicker.width
+            highlighted: profilePicker.highlightedIndex === index
+            contentItem: Text {
+              text: modelData.name; textFormat: Text.PlainText
+              color: window.ink; font: profilePicker.font; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight
+            }
+          }
         }
         Label { visible: window.connected && window.profiles.length > 1; text: qsTr("Disconnect to switch profiles."); color: window.muted; font.pixelSize: 11 }
       }

@@ -1,0 +1,40 @@
+# Maintainer: The Blue View Group Corporation
+pkgname=blue-view-sophos-vpn-client
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Independent community VPN client for Sophos-compatible OpenVPN profiles'
+arch=('x86_64' 'aarch64')
+url='https://github.com/Blue-View-Inc/blue-view-sophos-vpn-client'
+license=('custom:PolyForm-Noncommercial-1.0.0')
+depends=('qt6-base' 'qt6-declarative' 'qt6-svg' 'qt6-wayland' 'xdg-desktop-portal' 'networkmanager' 'networkmanager-openvpn' 'openvpn' 'libsecret' 'iproute2' 'libnotify')
+makedepends=('cargo' 'make' 'gcc' 'python')
+source=("${pkgname}-${pkgver}.tar.gz")
+sha256sums=('@SOURCE_SHA256@')
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cargo fetch --locked --manifest-path backend/Cargo.toml
+  cargo build --offline --locked --release --manifest-path backend/Cargo.toml
+  mkdir -p build
+  cd build
+  qmake6 ../sophosvpn.pro
+  make
+}
+
+check() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cp backend/target/release/sophosvpn-backend build/sophosvpn-backend
+  python tests/backend_smoke.py
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  install -Dm755 build/sophosvpn "${pkgdir}/usr/bin/sophosvpn"
+  install -Dm755 backend/target/release/sophosvpn-backend "${pkgdir}/usr/bin/sophosvpn-backend"
+  install -Dm644 packaging/sophosvpn.desktop "${pkgdir}/usr/share/applications/sophosvpn.desktop"
+  install -Dm644 src/blueviewvpn.svg "${pkgdir}/usr/share/icons/hicolor/scalable/apps/sophosvpn.svg"
+  install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 NOTICE "${pkgdir}/usr/share/licenses/${pkgname}/NOTICE"
+  install -Dm644 src/Caveat-OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}/Caveat-OFL.txt"
+  install -Dm644 src/LexendExa-OFL.txt "${pkgdir}/usr/share/licenses/${pkgname}/LexendExa-OFL.txt"
+}
