@@ -4,7 +4,7 @@
 
 A compact, independent Linux client for Sophos-compatible OpenVPN profiles. Originally created for [Omarchy Linux](https://omarchy.org/), it brings connection status, multiple VPN profiles, and a clean card-style interface to the desktop.
 
-Built by [Blue View Intelligence](https://blueview.ai/) and powered by [BvOs Intelligence](https://bvos.blueview.ai/)—Naturally Yours.
+Built by [The Blue View Group Corporation](https://blueview.ai/) and the Neutrino AI Lab team, powered by [BvOs Intelligence](https://bvos.blueview.ai/)—Naturally Yours.
 
 - **Made for the desktop:** A small Qt window with light and dark themes, connection details, and live tunnel traffic.
 - **Profiles and credentials:** Import supported `.ovpn` files, switch between profiles, and optionally save passwords in the system keyring. Enter one-time codes separately.
