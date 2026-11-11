@@ -2,7 +2,20 @@
 
 ![Blue View Sophos VPN Client with a fictional example profile](docs/screenshot.png)
 
-A Linux desktop client for Sophos-compatible OpenVPN profiles, by Blue View Intelligence and powered by BvOs Intelligence. A Qt Quick interface uses a Rust backend and NetworkManager to import a profile, connect or disconnect, and display tunnel status and traffic rates. Passwords can be saved in the user's Secret Service keyring.
+A compact, independent Linux client for Sophos-compatible OpenVPN profiles. Originally created for [Omarchy Linux](https://omarchy.org/), it brings connection status, multiple VPN profiles, and a clean card-style interface to the desktop.
+
+Built by [Blue View Intelligence](https://blueview.ai/) and powered by [BvOs Intelligence](https://bvos.blueview.ai/)—Naturally Yours.
+
+- **Made for the desktop:** A small Qt window with light and dark themes, connection details, and live tunnel traffic.
+- **Profiles and credentials:** Import supported `.ovpn` files, switch between profiles, and optionally save passwords in the system keyring. Enter one-time codes separately.
+- **Private by design:** No app telemetry or analytics. VPN profiles and settings stay on your system; the selected VPN server handles the connection.
+- **Community-focused:** Free to use under the noncommercial license, with a public codebase, contribution guide, and private vulnerability reporting.
+
+## Omarchy integration
+
+The original Omarchy setup includes a Sophos icon in the system bar. It shows a connection indicator and opens the compact application when clicked; the network panel can also open it. The app's **Connection** and **Details** tabs provide the controls and information previously shown in the bar card.
+
+The system-bar integration is currently a local Omarchy customization, **not yet included in the repository's installer**. The application itself can also run on other Linux desktops with the dependencies below. Contributions to package and simplify Omarchy integration are welcome.
 
 ## Requirements
 
