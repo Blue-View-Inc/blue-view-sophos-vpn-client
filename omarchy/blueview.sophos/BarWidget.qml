@@ -22,11 +22,11 @@ BarIconButton {
     }
   }
   onPressed: function(button) {
-    if (bar && button === Qt.LeftButton) bar.run("sophosvpn")
+    if (bar && button === Qt.LeftButton) bar.run("/usr/bin/sophosvpn")
   }
   Process {
     id: statusProcess
-    command: ["sophosvpn-backend"]
+    command: ["/usr/bin/sophosvpn-backend"]
     stdinEnabled: true
     onStarted: write('{"action":"status"}\n')
     stdout: StdioCollector {
