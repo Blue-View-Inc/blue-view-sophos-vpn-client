@@ -18,7 +18,8 @@ fi
 workdir=$(mktemp -d "${TMPDIR:-/tmp}/blueview-vpn-package.XXXXXXXX")
 trap 'rm -rf -- "$workdir"' EXIT HUP INT TERM
 archive="blue-view-sophos-vpn-client-$version.tar.gz"
-git -C "$root" archive --format=tar --prefix="blue-view-sophos-vpn-client-$version/" HEAD | gzip -n > "$workdir/$archive"
+git -C "$root" archive --format=tar --prefix="blue-view-sophos-vpn-client-$version/" -o "$workdir/source.tar" HEAD
+gzip -n -c "$workdir/source.tar" > "$workdir/$archive"
 sha=$(sha256sum "$workdir/$archive" | cut -d ' ' -f 1)
 sed -e "s/@VERSION@/$version/g" -e "s/@SOURCE_SHA256@/$sha/g" "$root/packaging/PKGBUILD.in" > "$workdir/PKGBUILD"
 mkdir -p "$workdir/packages"
