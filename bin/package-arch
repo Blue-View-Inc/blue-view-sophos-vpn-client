@@ -11,12 +11,21 @@ if [ -n "$(git -C "$root" status --porcelain --untracked-files=normal)" ]; then
   exit 1
 fi
 out="$root/dist/arch-$version"
-mkdir -p "$out"
+if [ -e "$out" ]; then
+  printf 'Output already exists: %s\nChoose a new version or move the old output.\n' "$out" >&2
+  exit 1
+fi
+workdir=$(mktemp -d "${TMPDIR:-/tmp}/blueview-vpn-package.XXXXXXXX")
+trap 'rm -rf -- "$workdir"' EXIT HUP INT TERM
 archive="blue-view-sophos-vpn-client-$version.tar.gz"
-git -C "$root" archive --format=tar --prefix="blue-view-sophos-vpn-client-$version/" HEAD | gzip -n > "$out/$archive"
-sha=$(sha256sum "$out/$archive" | cut -d ' ' -f 1)
-sed -e "s/@VERSION@/$version/g" -e "s/@SOURCE_SHA256@/$sha/g" "$root/packaging/PKGBUILD.in" > "$out/PKGBUILD"
+git -C "$root" archive --format=tar --prefix="blue-view-sophos-vpn-client-$version/" HEAD | gzip -n > "$workdir/$archive"
+sha=$(sha256sum "$workdir/$archive" | cut -d ' ' -f 1)
+sed -e "s/@VERSION@/$version/g" -e "s/@SOURCE_SHA256@/$sha/g" "$root/packaging/PKGBUILD.in" > "$workdir/PKGBUILD"
+mkdir -p "$workdir/packages"
+cd "$workdir"
+PACKAGER='The Blue View Group Corporation <devops@blueview.ai>' PKGDEST="$workdir/packages" makepkg --cleanbuild
+mkdir -p "$out"
+cp "$workdir/$archive" "$workdir/PKGBUILD" "$workdir/packages/"*.pkg.tar.zst "$out/"
 cd "$out"
-makepkg --cleanbuild --force
-sha256sum ./*.pkg.tar.zst > SHA256SUMS
+sha256sum ./*.pkg.tar.zst "$archive" PKGBUILD > SHA256SUMS
 printf 'Built in %s\n' "$out"
