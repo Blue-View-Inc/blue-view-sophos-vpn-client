@@ -8,6 +8,7 @@ url='https://github.com/Blue-View-Inc/blue-view-sophos-vpn-client'
 license=('custom:PolyForm-Noncommercial-1.0.0')
 depends=('qt6-base' 'qt6-declarative' 'qt6-svg' 'qt6-wayland' 'xdg-desktop-portal' 'networkmanager' 'networkmanager-openvpn' 'openvpn' 'libsecret' 'iproute2' 'libnotify')
 makedepends=('cargo' 'make' 'gcc' 'python')
+options=('!debug')
 source=("${pkgname}-${pkgver}.tar.gz")
 sha256sums=('@SOURCE_SHA256@')
 
