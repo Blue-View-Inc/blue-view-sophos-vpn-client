@@ -13,13 +13,27 @@ Built by [The Blue View Group Corporation](https://blueview.ai/) and the Neutrin
 
 ## Omarchy integration
 
-The original Omarchy setup includes a Sophos icon in the system bar. It shows a connection indicator and opens the compact application when clicked; the network panel can also open it. The app's **Connection** and **Details** tabs provide the controls and information previously shown in the bar card.
+The optional Omarchy bar widget opens the VPN client. Connection status, profile selection, and tunnel details are available in the app.
 
-The system-bar integration is currently a local Omarchy customization, **not yet included in the repository's installer**. The application itself can also run on other Linux desktops with the dependencies below. Contributions to package and simplify Omarchy integration are welcome.
+1. Install the dependencies below. Run `cargo fetch --locked --manifest-path backend/Cargo.toml` if the Rust dependencies are missing from your local cache.
+2. Run `bin/install-user` from this checkout to build and install the app for your account.
+3. To add the bar launcher, run `omarchy plugin add https://github.com/Blue-View-Inc/blue-view-sophos-vpn-client.git --enable` and place **Blue View Sophos VPN Client** on the bar using Omarchy's bar settings. The app is also available from the desktop application launcher.
+
+### Removal
+
+Disconnect the VPN and quit the app before removing it. Remove the optional bar launcher with `omarchy plugin remove blueview.sophos-vpn`. Remove the files installed by `bin/install-user` with:
+
+```sh
+rm -f -- "$HOME/.local/bin/sophosvpn" "$HOME/.local/bin/sophosvpn-backend" \
+  "$HOME/.local/share/applications/sophosvpn.desktop" \
+  "$HOME/.local/share/icons/hicolor/scalable/apps/sophosvpn.svg"
+```
+
+Removal leaves your NetworkManager profiles and preferences intact. Use the app's forget-password control before removing it if you want to clear a saved credential.
 
 ## Requirements
 
-Linux with NetworkManager, its OpenVPN plugin, OpenVPN, `nmcli`, `secret-tool`, `ip`, `notify-send`, a running Secret Service, Qt 6 Quick Controls, qmake6, a C++17 compiler, Rust and Cargo. The desktop file chooser uses Qt's desktop portal support.
+Linux with NetworkManager, its OpenVPN plugin, OpenVPN, `nmcli`, `secret-tool`, `ip`, `notify-send`, a running Secret Service, Qt 6 Quick Controls, qmake6, a C++17 compiler, Rust, Cargo, and Python 3 for the per-user installer. The desktop file chooser uses Qt's desktop portal support.
 
 ## Build and run
 
