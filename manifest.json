@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "blueview.sophos-vpn",
+  "name": "Blue View Sophos VPN Client",
+  "version": "0.1.0",
+  "author": "The Blue View Group Corporation",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "description": "Open the Blue View client for Sophos-compatible OpenVPN profiles from the Omarchy bar.",
+  "kinds": ["bar-widget"],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Blue View Sophos VPN Client",
+    "category": "Network",
+    "defaultSection": "right",
+    "allowMultiple": false
+  }
+}
